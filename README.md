@@ -1,2 +1,2 @@
 # configcenter-client
-A Java library for get or set config from a center, This library base on Zookeeper.
+A Java library for Configuration Management Client implemented by Zookeeper.
