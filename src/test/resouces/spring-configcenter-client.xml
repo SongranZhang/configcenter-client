@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-autowire="byName">
+
+    <!-- 失败重试 -->
+    <bean id="client" class="com.linkedkeeper.configcenter.client.impl.FailoverConfigCenterClient"
+          init-method="init" destroy-method="destroy">
+        <property name="zkServers" value="127.0.0.1:2181"/>
+        <property name="zNodePath" value="/configcenter/test"/>
+        <property name="storeFilePath" value="/configcenter/snapshot/"/>
+        <property name="recoveryFilePath" value="/configcenter/recovery/"/>
+        <!-- 输入则回调自定义监听 -->
+        <!--<property name="dataListener" ref="definedClientListener"/>-->
+    </bean>
+
+    <!-- 快速失败 -->
+    <!--
+    <bean id="client" class="com.linkedkeeper.configcenter.client.impl.FallFastConfigCenterClient"
+          init-method="init" destroy-method="destroy">
+        <property name="zkServers" value="127.0.0.1:2181"/>
+        <property name="zNodePath" value="/configcenter/test"/>
+    </bean>
+    -->
+
+    <bean id="configcenterStoreHandler" class="com.linkedkeeper.configcenter.recovery.RecoveryStoreHandler">
+        <property name="client" ref="client"/>
+        <property name="recoveryFilePath" value="/configcenter/recovery/"/>
+    </bean>
+
+    <!-- defined -->
+    <bean id="definedClientListener" class="com.linkedkeeper.configcenter.client.TestDefinedClientListener"/>
+
+    <!-- recovery timer -->
+    <bean id="recoveryQuartz" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="configcenterStoreHandler"/>
+        <property name="targetMethod" value="recovery"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+
+    <!--
+    <bean id="recoveryTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    -->
+    <bean id="recoveryTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="recoveryQuartz"/>
+        <property name="cronExpression" value="0 0/10 * * * ?"/>
+    </bean>
+
+    <bean id="recoveryScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="recoveryTrigger"/>
+            </list>
+        </property>
+        <property name="quartzProperties">
+            <props>
+                <prop key="org.quartz.threadPool.threadCount">1</prop>
+            </props>
+        </property>
+        <property name="autoStartup">
+            <value>true</value>
+        </property>
+    </bean>
+
+</beans>
+
