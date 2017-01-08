@@ -3,7 +3,7 @@ package com.linkedkeeper.configcenter.client;
 import com.linkedkeeper.configcenter.client.impl.DefinedConfigCenterClientListener;
 
 /**
- * Created by zhangsongran on 2015/11/20.
+ * Created by frank@linkedkeeper.com on 17/1/8.
  */
 public class TestDefinedClientListener implements DefinedConfigCenterClientListener {
 
