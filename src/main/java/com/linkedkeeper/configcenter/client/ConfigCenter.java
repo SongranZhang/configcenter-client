@@ -1,7 +1,7 @@
 package com.linkedkeeper.configcenter.client;
 
-import com.linkedkeeper.configcenter.recovery.DataSyncFallWatch;
-import com.linkedkeeper.configcenter.recovery.DataSyncStore;
+import com.linkedkeeper.configcenter.recovery.RecoveryFallWatch;
+import com.linkedkeeper.configcenter.recovery.RecoveryStore;
 import com.linkedkeeper.configcenter.snapshot.SnapshotFallWatch;
 import com.linkedkeeper.configcenter.snapshot.SnapshotStore;
 import com.linkedkeeper.configcenter.snapshot.SnapshotSyncWatch;
@@ -19,8 +19,8 @@ public interface ConfigCenter {
 
     SnapshotSyncWatch getSnapshotSyncWatch();
 
-    DataSyncFallWatch getDataSyncFallWatch();
+    RecoveryFallWatch getRecoveryFallWatch();
 
-    DataSyncStore getDataSyncStore();
+    RecoveryStore getRecoveryStore();
 
 }
