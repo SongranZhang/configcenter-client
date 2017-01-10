@@ -20,21 +20,25 @@ Clone this repository, and add it as a dependent maven project
 ```
 ###Recovery Config Xml
 ```xml
-<bean id="configcenterStoreHandler" class="com.linkedkeeper.configcenter.recovery.RecoveryStoreHandler">
+<bean id="configcenterStoreHandler" 
+          class="com.linkedkeeper.configcenter.recovery.RecoveryStoreHandler">
     <property name="client" ref="client"/>
     <property name="recoveryFilePath" value="/configcenter/recovery/"/>
 </bean>
 <!-- recovery timer -->
-<bean id="recoveryQuartz" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+<bean id="recoveryQuartz" 
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
     <property name="targetObject" ref="configcenterStoreHandler"/>
     <property name="targetMethod" value="recovery"/>
     <property name="concurrent" value="false"/>
 </bean>
-<bean id="recoveryTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+<bean id="recoveryTrigger" 
+          class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
     <property name="jobDetail" ref="recoveryQuartz"/>
     <property name="cronExpression" value="0 0/10 * * * ?"/>
 </bean>
-<bean id="recoveryScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+<bean id="recoveryScheduler" 
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
     <property name="triggers">
         <list>
             <ref bean="recoveryTrigger"/>
