@@ -10,8 +10,10 @@ import com.linkedkeeper.configcenter.zookeeper.serialize.ZkSerializer;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.*;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.data.Stat;
 
 import java.util.Date;
@@ -145,7 +147,7 @@ public class ZkClient extends ZkClientListener implements Watcher {
                 // If the session expired we have to signal all conditions, because watches might have been removed and
                 // there is no guarantee that those
                 // conditions will be signaled at all after an Expired event
-                if (watchedEvent.getState() == Event.KeeperState.Expired) {
+                if (watchedEvent.getState() == KeeperState.Expired) {
                     getEventLock().getZNodeEventCondition().signalAll();
                     getEventLock().getDataChangedCondition().signalAll();
                     // We also have to notify all listeners that something might have changed
@@ -293,12 +295,12 @@ public class ZkClient extends ZkClientListener implements Watcher {
             }
             try {
                 return callable.call();
-            } catch (KeeperException.ConnectionLossException e) {
+            } catch (ConnectionLossException e) {
                 log.error("retryUntilConnected ConnectionLossException e -> ", e);
                 // we give the event thread some time to update the status to 'Disconnected'
                 Thread.yield();
                 waitForRetry();
-            } catch (KeeperException.SessionExpiredException e) {
+            } catch (SessionExpiredException e) {
                 log.error("retryUntilConnected SessionExpiredException e -> ", e);
                 // we give the event thread some time to update the status to 'Expired'
                 Thread.yield();
@@ -325,7 +327,7 @@ public class ZkClient extends ZkClientListener implements Watcher {
         }
     }
 
-    public void setCurrentState(Event.KeeperState currentState) {
+    public void setCurrentState(KeeperState currentState) {
         getEventLock().lock();
         try {
             this.currentState = currentState;
@@ -347,10 +349,10 @@ public class ZkClient extends ZkClientListener implements Watcher {
     }
 
     public boolean waitUntilConnected(long time, TimeUnit timeUnit) throws ZkInterruptedException {
-        return waitForKeeperState(Event.KeeperState.SyncConnected, time, timeUnit);
+        return waitForKeeperState(KeeperState.SyncConnected, time, timeUnit);
     }
 
-    public boolean waitForKeeperState(Event.KeeperState keeperState, long time, TimeUnit timeUnit) throws ZkInterruptedException {
+    public boolean waitForKeeperState(KeeperState keeperState, long time, TimeUnit timeUnit) throws ZkInterruptedException {
         if (zookeeperEventThread != null && Thread.currentThread() == zookeeperEventThread) {
             throw new IllegalArgumentException("Must not be done in the zookeeper event thread.");
         }

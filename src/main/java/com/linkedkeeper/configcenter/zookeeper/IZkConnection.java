@@ -6,6 +6,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.ZooKeeper.States;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +38,7 @@ public interface IZkConnection {
 
     Stat writeDataReturnStat(String path, byte[] data, int version) throws KeeperException, InterruptedException;
 
-    ZooKeeper.States getZookeeperState();
+    States getZookeeperState();
 
     long getCreateTime(String path) throws KeeperException, InterruptedException;
 
